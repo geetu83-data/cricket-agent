@@ -14,7 +14,6 @@ from cricket_client import (
     get_match_details,
     get_player_stats,
     get_series_list,
-    compare_players,
 )
 
 
@@ -24,7 +23,6 @@ TOOLS (output ONLY JSON when calling):
 - get_live_matches: {"tool": "get_live_matches", "input": {}}
 - get_player_stats: {"tool": "get_player_stats", "input": {"player_name": "Name"}}
 - get_series_list: {"tool": "get_series_list", "input": {}}
-- compare_players: {"tool": "compare_players", "input": {"player1_name": "Name1", "player2_name": "Name2"}}
 
 RULES:
 1. Call a tool first (output only JSON, nothing else)
@@ -45,7 +43,6 @@ TOOL_HANDLERS = {
     "get_match_details": get_match_details,
     "get_player_stats": get_player_stats,
     "get_series_list": lambda **kwargs: get_series_list(),
-    "compare_players": compare_players,
 }
 
 
@@ -223,11 +220,42 @@ Output ONLY a JSON tool call. Example: {{"tool": "get_live_matches", "input": {{
                     self.conversation_history.append({"role": "assistant", "content": response})
                     return response
                 else:
-                    self._log("No tool call, retrying")
-                    prompt = f"User asked: {message}\n\nYou MUST respond with a JSON tool call. Example: {{\"tool\": \"get_live_matches\", \"input\": {{}}}}"
-                    if attempt >= 2:
-                        self.conversation_history.append({"role": "assistant", "content": response})
-                        return response
+                    # Try to auto-detect intent and call tool directly
+                    self._log("No tool call detected, trying auto-detect")
+                    msg_lower = message.lower()
+
+                    if any(word in msg_lower for word in ["live", "match", "score", "playing"]):
+                        result = self._execute_tool("get_live_matches", {})
+                        prompt = self._build_prompt(message, tool_result=result)
+                        used_tool = True
+                    elif any(word in msg_lower for word in ["series", "tournament", "ipl", "world cup", "upcoming"]):
+                        result = self._execute_tool("get_series_list", {})
+                        prompt = self._build_prompt(message, tool_result=result)
+                        used_tool = True
+                    elif any(word in msg_lower for word in ["kohli", "rohit", "dhoni", "sachin", "babar", "stokes", "smith", "stat", "player"]):
+                        # Extract player name
+                        player_names = ["virat kohli", "rohit sharma", "ms dhoni", "sachin tendulkar",
+                                       "babar azam", "ben stokes", "steve smith", "joe root", "kane williamson"]
+                        player = None
+                        for name in player_names:
+                            if name in msg_lower:
+                                player = name.title()
+                                break
+                        if not player:
+                            # Try to extract from message
+                            words = message.split()
+                            if len(words) >= 2:
+                                player = " ".join(words[:2]).title()
+                        if player:
+                            result = self._execute_tool("get_player_stats", {"player_name": player})
+                            prompt = self._build_prompt(message, tool_result=result)
+                            used_tool = True
+
+                    if not used_tool:
+                        if attempt >= 1:
+                            self.conversation_history.append({"role": "assistant", "content": response})
+                            return response
+                        prompt = f"User asked: {message}\n\nRespond with JSON: {{\"tool\": \"get_live_matches\", \"input\": {{}}}}"
 
         return "I had trouble processing that. Try asking about live matches, player stats, or upcoming series."
 

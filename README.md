@@ -33,8 +33,9 @@ for chasing, Babar (Pakistan) for consistency. Both are current generation great
 - **Live Scores** — Current matches, scores, and status
 - **Player Stats** — Career info, batting/bowling styles
 - **Series Info** — Upcoming tournaments, IPL, World Cup, Ashes
-- **Player Comparisons** — Side-by-side player analysis
 - **Conversation Memory** — Remembers context for follow-ups
+
+> **Note:** Historical match lookup by specific date requires premium API access. The free tier provides live, upcoming, and recently completed matches only.
 
 ## Architecture
 
@@ -100,9 +101,8 @@ Open http://localhost:8501
 |----------|--------------|
 | "Live matches" | Shows current games with scores |
 | "Virat Kohli stats" | Player career information |
-| "Compare Rohit vs Warner" | Side-by-side comparison |
 | "Upcoming series" | IPL, World Cup, bilateral series |
-| "India vs Australia score" | Specific match lookup |
+| "Tell me about Ben Stokes" | Player lookup |
 
 ## Project Structure
 

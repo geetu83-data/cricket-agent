@@ -47,22 +47,4 @@ TOOLS = [
             "required": []
         }
     },
-    {
-        "name": "compare_players",
-        "description": "Compare two cricket players side by side - their stats, playing styles, and careers.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "player1_name": {
-                    "type": "string",
-                    "description": "First player's name"
-                },
-                "player2_name": {
-                    "type": "string",
-                    "description": "Second player's name"
-                }
-            },
-            "required": ["player1_name", "player2_name"]
-        }
-    }
 ]

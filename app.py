@@ -114,8 +114,8 @@ st.markdown("""
     /* Buttons */
     .stButton > button {
         background: linear-gradient(90deg, #f0e68c 0%, #daa520 100%) !important;
-        color: #1a472a !important;
-        font-weight: 600 !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
         border: none !important;
         border-radius: 25px !important;
     }
@@ -123,6 +123,23 @@ st.markdown("""
     .stButton > button:hover {
         transform: scale(1.05);
         box-shadow: 0 0 20px rgba(240, 230, 140, 0.5) !important;
+        color: #000000 !important;
+    }
+
+    .stButton > button span,
+    .stButton > button p,
+    .stButton > button div {
+        color: #000000 !important;
+    }
+
+    /* Sidebar buttons specifically */
+    [data-testid="stSidebar"] .stButton > button {
+        background: linear-gradient(90deg, #f0e68c 0%, #daa520 100%) !important;
+        color: #000000 !important;
+    }
+
+    [data-testid="stSidebar"] .stButton > button span {
+        color: #000000 !important;
     }
 
     /* Status boxes */
@@ -241,14 +258,15 @@ with st.sidebar:
 
     st.markdown("## 💡 Try asking...")
     examples = [
-        "🔴 What matches are live right now?",
-        "🏏 Virat Kohli stats",
-        "⚔️ Compare Kohli vs Babar Azam",
-        "🏆 Upcoming cricket series",
-        "🌟 Tell me about Ben Stokes",
+        ("🔴 Live matches", "What matches are live right now?"),
+        ("🏏 Kohli stats", "Virat Kohli stats"),
+        ("🏆 Series", "Upcoming cricket series"),
+        ("🌟 Ben Stokes", "Tell me about Ben Stokes"),
     ]
-    for example in examples:
-        st.markdown(f"• {example}")
+    for label, query in examples:
+        if st.button(label, key=f"ex_{label}", use_container_width=True):
+            st.session_state.pending_query = query
+            st.rerun()
 
     st.divider()
 
@@ -278,6 +296,9 @@ if current_key and current_key != st.session_state.cricket_key_used:
     st.session_state.agent = None
     st.session_state.cricket_key_used = current_key
 
+if "pending_query" not in st.session_state:
+    st.session_state.pending_query = None
+
 # Main chat area
 col1, col2, col3 = st.columns([1, 3, 1])
 
@@ -300,7 +321,18 @@ with col2:
 
 is_ready = llm.is_available() and os.getenv("CRICKET_API_KEY")
 
-if prompt := st.chat_input("🏏 Ask about cricket...", disabled=not is_ready):
+# Chat input - always show this
+chat_prompt = st.chat_input("🏏 Ask about cricket...", disabled=not is_ready)
+
+# Handle pending query from example buttons OR chat input
+prompt = None
+if st.session_state.pending_query and is_ready:
+    prompt = st.session_state.pending_query
+    st.session_state.pending_query = None
+elif chat_prompt:
+    prompt = chat_prompt
+
+if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
     with col2:
         with st.chat_message("user", avatar="🧑"):

@@ -218,31 +218,3 @@ def get_series_list() -> dict:
     }
 
 
-def compare_players(player1_name: str, player2_name: str) -> dict:
-    """Compare two players' stats."""
-    player1 = get_player_stats(player1_name)
-    player2 = get_player_stats(player2_name)
-
-    if "error" in player1:
-        return {"error": f"Could not find {player1_name}: {player1['error']}"}
-    if "error" in player2:
-        return {"error": f"Could not find {player2_name}: {player2['error']}"}
-
-    return {
-        "comparison": [
-            {
-                "name": player1.get("name"),
-                "country": player1.get("country"),
-                "role": player1.get("role"),
-                "batting_style": player1.get("batting_style"),
-                "bowling_style": player1.get("bowling_style"),
-            },
-            {
-                "name": player2.get("name"),
-                "country": player2.get("country"),
-                "role": player2.get("role"),
-                "batting_style": player2.get("batting_style"),
-                "bowling_style": player2.get("bowling_style"),
-            }
-        ]
-    }
