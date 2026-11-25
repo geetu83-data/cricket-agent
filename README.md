@@ -2,6 +2,10 @@
 
 An AI-powered conversational agent for live cricket scores, player stats, and match information. 100% free, runs locally.
 
+![Cricket Agent Demo](images/screenshot-main.png)
+
+![Cricket Agent Chat](images/screenshot-chat.png)
+
 ## What it does
 
 Ask natural language questions and get real-time cricket data:
@@ -62,38 +66,42 @@ for chasing, Babar (Pakistan) for consistency. Both are current generation great
 
 ## Quick Start
 
-### 1. Get API Key (free)
+### Prerequisites
 
-Sign up at https://cricapi.com/ — 100 requests/day free.
+1. **Python 3.11+** — [Download](https://www.python.org/downloads/)
+2. **Ollama** — [Download](https://ollama.ai) (for local LLM)
+3. **CricAPI Key** — [Get free](https://cricapi.com/) (100 requests/day)
 
-### 2. Setup
+### Step-by-Step Setup
 
 ```bash
+# 1. Clone the repo
 git clone https://github.com/geetu83-data/cricket-agent.git
 cd cricket-agent
 
+# 2. Create virtual environment
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-### 3. Start Ollama
-
-```bash
-# Install from https://ollama.ai if needed
+# 4. Start Ollama (in a separate terminal)
 ollama serve
+
+# 5. Pull the LLM model (first time only, ~5GB download)
 ollama pull llama3.1:8b
-```
 
-### 4. Run
-
-```bash
-export CRICKET_API_KEY='your-api-key'
+# 6. Set your API key and run
+export CRICKET_API_KEY='your-api-key-here'  # Windows: set CRICKET_API_KEY=your-key
 streamlit run app.py
 ```
 
-Open http://localhost:8501
+### 7. Open in browser
+
+Go to **http://localhost:8501** — the app will open automatically!
+
+> **Tip:** Keep `ollama serve` running in a separate terminal while using the app.
 
 ## Example Questions
 
